@@ -1,25 +1,41 @@
-import os
-from flask import Flask
+from flask import Flask, jsonify
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+import torch
+import random
+import string
+
 
 app = Flask(__name__)
 
+# Load the pre-trained model and tokenizer
+tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
+model = DistilBertForSequenceClassification.from_pretrained(
+    "distilbert-base-uncased", num_labels=2
+)
 
-@app.route('/')
-def base_route():
-    return '<h1>Hey I am {}!</h1>'.format(os.environ['INSTANCE_ID_EC2'])
 
-@app.route('/cluster1')
-def cluster_route_1():
-    return '<h1>Hey I am {} and I am currently running of the first cluster</h1>'.format(os.environ['INSTANCE_ID_EC2'])
+def generate_random_text(length=50):
+    letters = string.ascii_lowercase + " "
+    return "".join(random.choice(letters) for i in range(length))
 
-@app.route('/cluster2')
-def cluster_route_2():
-    return '<h1>Hey I am {} and I am currently running of the second cluster</h1>'.format(os.environ['INSTANCE_ID_EC2'])
 
-@app.route('/hello')
-def hello_route():
-    return '<h1>Hello World</h1>'
+@app.route("/run_model", methods=["POST"])
+def run_model():
+    # Generate random input text
+    input_text = generate_random_text()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    # Tokenize the input text and run it through the model
+    inputs = tokenizer(input_text, run_tensors="pt", padding=True, truncation=True)
+    outputs = model(**inputs)
 
+    # The model returns logits, so let's turn that into probabilities
+    probabilities = torch.softmax(outputs.logits, dim=-1)
+
+    # Convert the tensor to a list and return
+    probabilities_list = probabilities.tolist()[0]
+
+    return jsonify({"input_text": input_text, "probabilities": probabilities_list})
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)  # Adjust the port as needed for your setup

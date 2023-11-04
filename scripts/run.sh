@@ -21,19 +21,12 @@ echo "export AWS_ACCESS_KEY='$AWS_ACCESS_KEY'" > env_vars.sh
 echo "export AWS_SECRET_ACCESS_KEY='$AWS_SECRET_ACCESS_KEY'" >> env_vars.sh
 echo "export AWS_SESSION_TOKEN='$AWS_SESSION_TOKEN'" >> env_vars.sh
 
-echo -e "Starting Assignment 1...\n"
+echo -e "Starting Assignment 2...\n"
 echo -e "-----------\n"
 
 ## Deploying the infrastructure
 echo -e "Deploying the infrastructure...\n"
 ./create_instances.sh
-
-## Sending the requests to the load balancer
-./send_requests.sh
-
-# Running the benchmark
-echo -e "Running the benchmarks...\n"
-./run_benchmark.sh
 
 # Terminating the infrastructure
 echo -e "Terminating infrastructure...\n"
@@ -42,4 +35,4 @@ echo -e "Terminating infrastructure...\n"
 # Clears the content of env_vars.sh
 > env_vars.sh
 
-echo -e "You successfully ended Assignment 1 :)"
+echo -e "You successfully ended Assignment 2 :)"
