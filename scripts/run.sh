@@ -29,10 +29,10 @@ echo -e "Deploying the infrastructure...\n"
 ./create_instances.sh
 
 # Terminating the infrastructure
-echo -e "Terminating infrastructure...\n"
-./kill_instances.sh
+# echo -e "Terminating infrastructure...\n"
+# ./kill_instances.sh
 
 # Clears the content of env_vars.sh
-> env_vars.sh
+# > env_vars.sh
 
 echo -e "You successfully ended Assignment 2 :)"

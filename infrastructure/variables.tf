@@ -10,10 +10,8 @@ variable "aws_session_token" {
   description = "Session token to AWS console"
 }
 
-variable "key_pair_name_orchestrator" {
-  description = "Key pair name for the orchestrator instance"
+variable "key_pair_name" {
+  description = "Key pair name for the orchestrator and worker instances"
+  default     = "my-key-pair"
 }
 
-variable "key_pair_name_workers" {
-  description = "Key pair name for the worker instances"
-}

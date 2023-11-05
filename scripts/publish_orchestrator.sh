@@ -6,4 +6,4 @@ docker build -f ../orchestrator/Dockerfile -t orchestrator ../orchestrator
 docker tag orchestrator mingxiaoyuan/orchestrator:latest
 
 # Push the Docker image to the repository
-docker push mingxiaoyuan/orchestrator:late
+docker push mingxiaoyuan/orchestrator:latest

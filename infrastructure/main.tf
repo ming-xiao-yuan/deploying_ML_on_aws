@@ -20,17 +20,19 @@ resource "aws_security_group" "security_group" {
   vpc_id = data.aws_vpc.default.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 }
 
@@ -39,20 +41,16 @@ data "aws_vpc" "default" {
   default = true
 }
 
-resource "aws_key_pair" "key_pair_name_orchestrator" {
-  key_name   = var.key_pair_name_orchestrator
+resource "aws_key_pair" "key_pair_name" {
+  key_name   = var.key_pair_name
   public_key = file("my_terraform_key.pub")
 }
 
-resource "aws_key_pair" "key_pair_name_workers" {
-  key_name   = var.key_pair_name_workers
-  public_key = file("my_terraform_key.pub")
-}
 
 resource "aws_instance" "orchestrator" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "m4.large"
-  key_name               = aws_key_pair.key_pair_name_orchestrator.key_name
+  key_name               = aws_key_pair.key_pair_name.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
   availability_zone      = "us-east-1d"
   user_data              = file("./orchestrator_user_data.sh")
@@ -64,7 +62,7 @@ resource "aws_instance" "orchestrator" {
 resource "aws_instance" "workers" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "m4.large"
-  key_name               = aws_key_pair.key_pair_name_workers.key_name
+  key_name               = aws_key_pair.key_pair_name.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
   availability_zone      = "us-east-1d"
   user_data              = file("./worker_user_data.sh")
