@@ -1,3 +1,12 @@
+"""
+This Flask application serves as a worker instance for running ML inference using a pre-trained DistilBert model.
+The '/run_model' route listens for POST requests to perform inference on randomly generated text.
+It tokenizes the input, runs it through the DistilBertForSequenceClassification model, and returns the probabilities as a JSON response.
+
+Usage:
+The server starts on port 5000 and listens on all network interfaces.
+"""
+
 from flask import Flask, jsonify
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import torch

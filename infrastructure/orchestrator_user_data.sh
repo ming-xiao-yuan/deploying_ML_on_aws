@@ -10,7 +10,13 @@ sudo usermod -a -G docker ec2-user
 sudo service docker start
 
 # Pull the latest orchestrator image from Docker Hub
-sudo docker pull mingxiaoyuan/orchestrator:latest
+#!/bin/bash
+{
+    echo "Starting Docker image pull at $(date)"
+    sudo docker pull mingxiaoyuan/orchestrator:latest
+    echo "Docker image pull completed at $(date)"
+} >> /var/log/docker_pull.log 2>&1
+
 
 # In the docker container, expose the ec2 instance id
 export INSTANCE_ID_EC2=$(ec2-metadata --instance-id)
