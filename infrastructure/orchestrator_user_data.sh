@@ -10,7 +10,6 @@ sudo usermod -a -G docker ec2-user
 sudo service docker start
 
 # Pull the latest orchestrator image from Docker Hub
-#!/bin/bash
 {
     echo "Starting Docker image pull at $(date)"
     sudo docker pull mingxiaoyuan/orchestrator:latest
