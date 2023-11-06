@@ -52,5 +52,12 @@ def new_request():
     return jsonify({"message": "Request received and processing started."})
 
 
+@app.route("/dummy", methods=["GET"])
+def dummy():
+    return "<h1>Hello Dummy, I am instance {}!</h1>".format(
+        os.environ["INSTANCE_ID_EC2"]
+    )
+
+
 if __name__ == "__main__":
-    app.run(port=80)
+    app.run(host="0.0.0.0", port=80)

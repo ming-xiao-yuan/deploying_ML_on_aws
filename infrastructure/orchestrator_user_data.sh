@@ -22,4 +22,4 @@ sudo service docker start
 export INSTANCE_ID_EC2=$(ec2-metadata --instance-id)
 
 # Run the Flask app inside a Docker container
-sudo docker run -e INSTANCE_ID_EC2="$INSTANCE_ID_EC2" -d -p 80:5000 mingxiaoyuan/orchestrator:latest
+sudo docker run -e INSTANCE_ID_EC2="$INSTANCE_ID_EC2" -d -p 80:80 mingxiaoyuan/orchestrator:latest

@@ -60,8 +60,12 @@ resource "aws_instance" "orchestrator" {
 }
 
 resource "aws_instance" "workers" {
-  ami                    = "ami-03a6eaae9938c858c"
-  instance_type          = "m4.large"
+  ami           = "ami-03a6eaae9938c858c"
+  instance_type = "m4.large"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = 100
+  }
   key_name               = aws_key_pair.key_pair_name.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
   availability_zone      = "us-east-1d"

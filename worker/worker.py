@@ -7,6 +7,7 @@ Usage:
 The server starts on port 5000 and listens on all network interfaces.
 """
 
+import os
 from flask import Flask, jsonify
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import torch
@@ -26,6 +27,13 @@ model = DistilBertForSequenceClassification.from_pretrained(
 def generate_random_text(length=50):
     letters = string.ascii_lowercase + " "
     return "".join(random.choice(letters) for i in range(length))
+
+
+@app.route("/dummy", methods=["GET"])
+def dummy():
+    return "<h1>Hello Dummy, I am instance {}!</h1>".format(
+        os.environ["INSTANCE_ID_EC2"]
+    )
 
 
 @app.route("/run_model", methods=["POST"])
