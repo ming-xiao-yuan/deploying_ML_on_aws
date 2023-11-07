@@ -1,12 +1,12 @@
-variable "aws_access_key_id" {
+variable "AWS_ACCESS_KEY" {
   description = "Access key to AWS console"
 }
 
-variable "aws_secret_access_key" {
+variable "AWS_SECRET_ACCESS_KEY" {
   description = "Secret key to AWS console"
 }
 
-variable "aws_session_token" {
+variable "AWS_SESSION_TOKEN" {
   description = "Session token to AWS console"
 }
 

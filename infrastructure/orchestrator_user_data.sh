@@ -12,7 +12,8 @@ sudo service docker start
 # Pull the latest orchestrator image from Docker Hub
 {
     echo "Starting Docker image pull at $(date)"
-    sudo docker pull mingxiaoyuan/orchestrator:latest
+    # sudo docker pull mingxiaoyuan/orchestrator:latest
+    sudo docker pull ikrash3d/orchestrator:latest
     echo "Docker image pull completed at $(date)"
 } >> /var/log/docker_pull.log 2>&1
 
@@ -23,4 +24,5 @@ tail -f /var/log/docker_pull.log
 export INSTANCE_ID_EC2=$(ec2-metadata --instance-id)
 
 # Run the Flask app inside a Docker container
-sudo docker run -e INSTANCE_ID_EC2="$INSTANCE_ID_EC2" -d -p 80:80 mingxiaoyuan/orchestrator:latest
+# sudo docker run -e INSTANCE_ID_EC2="$INSTANCE_ID_EC2" -d -p 80:80 mingxiaoyuan/orchestrator:latest
+sudo docker run -e INSTANCE_ID_EC2="$INSTANCE_ID_EC2" -d -p 80:80 ikrash3d/orchestrator:latest

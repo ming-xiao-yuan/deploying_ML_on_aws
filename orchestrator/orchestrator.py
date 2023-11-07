@@ -58,21 +58,34 @@ def new_request():
 
 @app.route("/dummy", methods=["GET"])
 def dummy():
-    return "<h1>Hello Dummy, I am instance !</h1>"
+    AWS_ACCESS_KEY=os.environ.get("AWS_ACCESS_KEY")    
+    return "<h1>Hello Dummy, I am instance: {} !</h1>".format(AWS_ACCESS_KEY)
 
 
 def populate_ip_addresses():
-    AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    AWS_SESSION_TOKEN = os.environ.get("AWS_SESSION_TOKEN")
+    # AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
+    # AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    # AWS_SESSION_TOKEN = os.environ.get("AWS_SESSION_TOKEN")
 
-    # Initialize a boto3 EC2 client
+    # AWS_ACCESS_KEY='ASIARBQTVE5IKAMFMZMF'
+    # AWS_SECRET_ACCESS_KEY='yqOxZeYh3lyWQWqV3Q1OVnf44cHdY2ljU+WrOlH+'
+    # AWS_SESSION_TOKEN='FwoGZXIvYXdzEHQaDIAvAuPUHBxr3x2ujyLIAdclN3KAmlUnRkgi53kzwH+X3SL7Z3G+oGJ4aP83nP8SsZavikP4ftMVTFUdZbStXfX5GAqusbbXuew2Q4rwYfEpABPM0bCL6wDemdhAuqYaYoJHd2uAV6GtzGMZZY3HJYXQL+2JnPtN8RhmxnNsJcDcAVOms2lBzXdu9HEPPSZXp8MxmUdFC4TKvEyDEvNwKBykpvUN6vNdCidFr233Nv3/PuoskvDdeVjxnU5R81choBxBbNIG1QyVMRwkWa5IsEMQI5snvev1KJPEpqoGMi2hRqyyh1SV2G+CdqX8+Z08K3c+pifCpySyiFcT1h0Os0yCN/c2jdKZtBTToCk='
+
+
+
+    
+    sts_client = boto3.client("sts")
+    
+    sts_response = sts_client.assume_role(RoleArn='arn:aws:sts::071981934416:assumed-role/voclabs/user2750118=samy.cheklat@polymtl.ca', RoleSessionName="test_session")
+    temporary_credentials = sts_response['Credentials']
+    
+        # # Initialize a boto3 EC2 client
     ec2_client = boto3.client(
         "ec2",
         region_name="us-east-1",
-        aws_access_key_id=AWS_ACCESS_KEY,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        aws_session_token=AWS_SESSION_TOKEN,
+        aws_access_key_id=temporary_credentials['AccessKeyId'],
+        aws_secret_access_key=temporary_credentials['SecretAccessKey'],
+        aws_session_token=temporary_credentials['SessionToken'],
     )
 
     # Fetch all EC2 instances with a specific tag, e.g., "Worker"
