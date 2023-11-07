@@ -16,6 +16,8 @@ sudo service docker start
     echo "Docker image pull completed at $(date)"
 } >> /var/log/docker_pull.log 2>&1
 
+# Display the logs in real time
+tail -f /var/log/docker_pull.log
 
 # In the docker container, expose the ec2 instance id
 export INSTANCE_ID_EC2=$(ec2-metadata --instance-id)

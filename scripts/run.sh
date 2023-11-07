@@ -3,6 +3,15 @@
 # Access the env variables
 source env_vars.sh
 
+cd ../infrastructure
+
+echo "Please provide your email for the SSH Key"
+read EMAIL
+
+ssh-keygen -t rsa -b 4096 -C $EMAIL -f my_terraform_key
+
+cd ../scripts
+
 # Getting AWS credentials from the terminal
 echo "Please provide your AWS Access Key: "
 read AWS_ACCESS_KEY
