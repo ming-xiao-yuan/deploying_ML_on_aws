@@ -1,15 +1,31 @@
 import os
 from flask import Flask, request, jsonify
+import logging
 import threading
 import time
-import json
-import boto3
 import json
 
 
 app = Flask(__name__)
 lock = threading.Lock()
 request_queue = []
+
+
+@app.route("/receive_ips_from_workers", methods=["POST"])
+def receive_ips():
+    # Parse the JSON sent to this endpoint
+    worker_ips = request.get_json()  # This assumes the JSON array is sent directly
+
+    # Print the worker_ips to the console
+    if worker_ips:
+        app.logger.info("Received worker IPs:")
+        for ip in worker_ips:
+            app.logger.info(ip)
+    else:
+        app.logger.warning("No worker IPs received")
+
+    # Respond to the client that the request was successful
+    return jsonify({"message": "Worker IPs received"}), 200
 
 
 def send_requests_to_container(container_id, container_info, incoming_request_data):
@@ -63,4 +79,5 @@ def dummy():
 
 
 if __name__ == "__main__":
+    app.logger.setLevel(logging.INFO)
     app.run(host="0.0.0.0", port=80)

@@ -82,16 +82,13 @@ data "aws_instances" "worker_details" {
     Role = "Worker"
   }
 }
+# Output the public dns of the Orchestrator
+output "orchestrator_public_dns" {
+  value = aws_instance.orchestrator.public_dns
+}
 
 # Output the public IPs of worker instances
 output "worker_ips" {
-  value = [
-    for instance in data.aws_instances.worker_details.ids :
-    aws_instance.worker[instance].public_ip
-  ]
-}
-
-output "orchestrator_url" {
-  description = "The infrastructure orchestrator url"
-  value       = aws_instance.orchestrator.public_dns
+  description = "The public IPs of worker instances"
+  value       = aws_instance.workers[*].public_ip
 }

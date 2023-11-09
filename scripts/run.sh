@@ -23,9 +23,9 @@ echo "Please provide your AWS Session Token: "
 read AWS_SESSION_TOKEN
 
 # # Exporting the credentials to be accessible in all the scripts
-# echo "export AWS_ACCESS_KEY='$AWS_ACCESS_KEY'" > env_vars.sh
-# echo "export AWS_SECRET_ACCESS_KEY='$AWS_SECRET_ACCESS_KEY'" >> env_vars.sh
-# echo "export AWS_SESSION_TOKEN='$AWS_SESSION_TOKEN'" >> env_vars.sh
+echo "export AWS_ACCESS_KEY='$AWS_ACCESS_KEY'" > env_vars.sh
+echo "export AWS_SECRET_ACCESS_KEY='$AWS_SECRET_ACCESS_KEY'" >> env_vars.sh
+echo "export AWS_SESSION_TOKEN='$AWS_SESSION_TOKEN'" >> env_vars.sh
 
 echo -e "Starting Assignment 2...\n"
 echo -e "-----------\n"
