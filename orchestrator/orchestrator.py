@@ -13,19 +13,42 @@ request_queue = []
 
 @app.route("/receive_ips_from_workers", methods=["POST"])
 def receive_ips():
-    # Parse the JSON sent to this endpoint
-    worker_ips = request.get_json()  # This assumes the JSON array is sent directly
+    worker_ips = request.get_json()
 
-    # Print the worker_ips to the console
     if worker_ips:
         app.logger.info("Received worker IPs:")
         for ip in worker_ips:
             app.logger.info(ip)
+        try:
+            update_test_json_with_ips(worker_ips)
+        except Exception as e:
+            app.logger.error(f"Failed to update test.json: {e}")
+            return jsonify({"error": "Failed to update test.json"}), 500
     else:
         app.logger.warning("No worker IPs received")
+        return jsonify({"error": "No worker IPs received"}), 400
 
-    # Respond to the client that the request was successful
-    return jsonify({"message": "Worker IPs received"}), 200
+    return jsonify({"message": "Worker IPs received and test.json updated"}), 200
+
+
+def update_test_json_with_ips(worker_ips):
+    # For this example, we're assuming each IP is sequentially assigned to two containers
+    with lock:
+        with open("test.json", "r") as file:
+            data = json.load(file)
+
+        # Map each IP to two containers
+        for i, ip in enumerate(worker_ips):
+            data[f"container{i*2+1}"]["ip"] = ip
+            data[f"container{i*2+2}"]["ip"] = ip
+
+        # Write the updated data back to the file
+        with open("test.json", "w") as file:
+            json.dump(data, file, indent=4)
+
+    # Print the updated test.json to the logs
+    app.logger.info("Updated test.json with new IPs:")
+    app.logger.info(json.dumps(data, indent=4))
 
 
 def send_requests_to_container(container_id, container_info, incoming_request_data):
