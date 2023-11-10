@@ -34,8 +34,6 @@ def update_test_json_with_ips(worker_ips):
 
 def send_requests_to_container(container_id, container_info, incoming_request_data):
     app.logger.info(f"Sending request to {container_id} with data:{incoming_request_data}...")
-    # TODO: Put the code to call your instance here
-    # this should get the ip of the instance, alongside the port and send the requiest to it
     container_ip = container_info["ip"]
     container_port = container_info["port"]
     container_url = "http://" + container_ip + ":" + container_port + "/run_model"
@@ -54,6 +52,22 @@ def update_container_status(container_id, status):
             json.dump(data, f)
 
 
+def find_free_container(data):
+    for container_id, container_info in data.items():
+        if container_info["status"] == "free":
+            return container_id
+    return None
+
+
+def process_request_in_container(free_container, data, request_data):
+    if free_container:
+        update_container_status(free_container, "busy")
+        send_requests_to_container(free_container, data[free_container], request_data)
+        update_container_status(free_container, "free")
+    else:
+        request_queue.append(request_data)
+
+
 def process_request(incoming_request_data):
     with lock:
         with open("test.json", "r") as f:
@@ -62,35 +76,23 @@ def process_request(incoming_request_data):
     # Process the incoming request data
     free_container = find_free_container(data)
     
-    if free_container:
-        update_container_status(free_container, "busy")
-        send_requests_to_container(free_container, data[free_container], incoming_request_data)
-        update_container_status(free_container, "free")
-    else:
-        request_queue.append(incoming_request_data)
+    process_request_in_container(free_container=free_container, data=data, request_data=incoming_request_data)
         
-        # Process items in the request queue
-    while len(request_queue) > 0:
-        current_request = request_queue.pop(0)  # Dequeue the first request
+    # Process items in the request queue
+    while request_queue:
+        if not request_queue:
+            app.logger.info(f"========== All requests have been processed ==========")    
+            break
+        
+        # Dequeue the first request
+        current_request = request_queue.pop(0)  
         free_container = find_free_container(data)
-
-        if free_container:
-            update_container_status(free_container, "busy")
-            send_requests_to_container(free_container, data[free_container], current_request)
-            update_container_status(free_container, "free")
-        else:
-            # If no free container, requeue the request
-            request_queue.append(current_request)
-
-    app.logger.info(request_queue)
-
-
-def find_free_container(data):
-    for container_id, container_info in data.items():
-        if container_info["status"] == "free":
-            return container_id
-    return None
-
+        
+        process_request_in_container(free_container=free_container, data=data, request_data=current_request)
+         
+    app.logger.info(f"Current queue: {request_queue}.")
+    
+    
 # Routes
 
 @app.route("/health_check", methods=["GET"])
