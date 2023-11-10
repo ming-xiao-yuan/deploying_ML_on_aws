@@ -9,10 +9,10 @@ def make_request(url):
     return f"URL: {url}, Status Code: {response.status_code}"
 
 # URL to request
-url = "http://3.90.244.135/new_request"
+url = "http://52.203.142.231/new_request"
 
 # Set the number of concurrent requests
-num_concurrent_requests = 5
+num_concurrent_requests = 20
 
 # Create a list of the same URL to be hit concurrently
 urls = [url] * num_concurrent_requests

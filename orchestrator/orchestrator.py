@@ -2,7 +2,6 @@ import os
 from flask import Flask, request, jsonify
 import logging
 import threading
-import time
 import json
 from requests import post
 
@@ -11,26 +10,7 @@ app = Flask(__name__)
 lock = threading.Lock()
 request_queue = []
 
-
-@app.route("/receive_ips_from_workers", methods=["POST"])
-def receive_ips():
-    worker_ips = request.get_json()
-
-    if worker_ips:
-        app.logger.info("Received worker IPs:")
-        for ip in worker_ips:
-            app.logger.info(ip)
-        try:
-            update_test_json_with_ips(worker_ips)
-        except Exception as e:
-            app.logger.error(f"Failed to update test.json: {e}")
-            return jsonify({"error": "Failed to update test.json"}), 500
-    else:
-        app.logger.warning("No worker IPs received")
-        return jsonify({"error": "No worker IPs received"}), 400
-
-    return jsonify({"message": "Worker IPs received and test.json updated"}), 200
-
+# Handlers
 
 def update_test_json_with_ips(worker_ips):
     # For this example, we're assuming each IP is sequentially assigned to two containers
@@ -72,42 +52,46 @@ def update_container_status(container_id, status):
         data[container_id]["status"] = status
         with open("test.json", "w") as f:
             json.dump(data, f)
-            
-        # with open("test.json", "r") as f:
-        #     updated_data = json.load(f)
-        #     app.logger.info("Updated status: %s", json.dumps(updated_data, indent=4))
-
-        
 
 
 def process_request(incoming_request_data):
     with lock:
         with open("test.json", "r") as f:
             data = json.load(f)
-
-    free_container = None
-    for container_id, container_info in data.items():
-        if container_info["status"] == "free":
-            free_container = container_id
-            break
+            
+    # Process the incoming request data
+    free_container = find_free_container(data)
+    
     if free_container:
         update_container_status(free_container, "busy")
-        send_requests_to_container(
-            free_container, data[free_container], incoming_request_data
-        )
+        send_requests_to_container(free_container, data[free_container], incoming_request_data)
         update_container_status(free_container, "free")
     else:
         request_queue.append(incoming_request_data)
-    
+        
+        # Process items in the request queue
+    while len(request_queue) > 0:
+        current_request = request_queue.pop(0)  # Dequeue the first request
+        free_container = find_free_container(data)
+
+        if free_container:
+            update_container_status(free_container, "busy")
+            send_requests_to_container(free_container, data[free_container], current_request)
+            update_container_status(free_container, "free")
+        else:
+            # If no free container, requeue the request
+            request_queue.append(current_request)
+
     app.logger.info(request_queue)
 
 
-@app.route("/new_request", methods=["POST"])
-def new_request():
-    incoming_request_data = request.json
-    threading.Thread(target=process_request, args=(incoming_request_data,)).start()
-    return jsonify({"message": "Request received and processing started."})
+def find_free_container(data):
+    for container_id, container_info in data.items():
+        if container_info["status"] == "free":
+            return container_id
+    return None
 
+# Routes
 
 @app.route("/health_check", methods=["GET"])
 def health_check():
@@ -115,6 +99,32 @@ def health_check():
         os.environ["INSTANCE_ID_EC2"]
     )
 
+
+@app.route("/receive_ips_from_workers", methods=["POST"])
+def receive_ips():
+    worker_ips = request.get_json()
+
+    if worker_ips:
+        app.logger.info("Received worker IPs:")
+        for ip in worker_ips:
+            app.logger.info(ip)
+        try:
+            update_test_json_with_ips(worker_ips)
+        except Exception as e:
+            app.logger.error(f"Failed to update test.json: {e}")
+            return jsonify({"error": "Failed to update test.json"}), 500
+    else:
+        app.logger.warning("No worker IPs received")
+        return jsonify({"error": "No worker IPs received"}), 400
+
+    return jsonify({"message": "Worker IPs received and test.json updated"}), 200
+
+
+@app.route("/new_request", methods=["POST"])
+def new_request():
+    incoming_request_data = request.json
+    threading.Thread(target=process_request, args=(incoming_request_data,)).start()
+    return jsonify({"message": "Request received and processing started."})
 
 if __name__ == "__main__":
     app.logger.setLevel(logging.INFO)
