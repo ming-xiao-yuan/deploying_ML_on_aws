@@ -29,9 +29,9 @@ def generate_random_text(length=50):
     return "".join(random.choice(letters) for i in range(length))
 
 
-@app.route("/dummy", methods=["GET"])
-def dummy():
-    return "<h1>Hello Dummy, I am instance {}!</h1>".format(
+@app.route("/health_check", methods=["GET"])
+def health_check():
+    return "<h1>Hello, I am a worker instance {} and I am running!</h1>".format(
         os.environ["INSTANCE_ID_EC2"]
     )
 
@@ -42,7 +42,7 @@ def run_model():
     input_text = generate_random_text()
 
     # Tokenize the input text and run it through the model
-    inputs = tokenizer(input_text, run_tensors="pt", padding=True, truncation=True)
+    inputs = tokenizer(input_text, return_tensors="pt", padding=True, truncation=True)
     outputs = model(**inputs)
 
     # The model returns logits, so let's turn that into probabilities

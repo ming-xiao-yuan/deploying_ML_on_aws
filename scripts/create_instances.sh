@@ -8,7 +8,7 @@ echo -e "Creating instances...\n"
 cd ../infrastructure
 
 # Initilize Terraform
-terraform init
+terraform.exe init
 
 # Apply the Terraform configuration
 terraform.exe apply -auto-approve -var="AWS_ACCESS_KEY=$AWS_ACCESS_KEY" -var="AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" -var="AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
@@ -24,7 +24,7 @@ ORCHESTRATOR_DNS=$(terraform output -raw orchestrator_public_dns)
 
 # Function to check if the orchestrator is up and running
 check_orchestrator() {
-  curl -m 5 -s "http://$ORCHESTRATOR_DNS/dummy" > /dev/null
+  curl -m 5 -s "http://$ORCHESTRATOR_DNS/health_check" > /dev/null
   return $?
 }
 

@@ -4,6 +4,7 @@ import logging
 import threading
 import time
 import json
+from requests import post
 
 
 app = Flask(__name__)
@@ -52,10 +53,16 @@ def update_test_json_with_ips(worker_ips):
 
 
 def send_requests_to_container(container_id, container_info, incoming_request_data):
-    print(f"Sending request to {container_id} with data:{incoming_request_data}...")
+    app.logger.info(f"Sending request to {container_id} with data:{incoming_request_data}...")
     # TODO: Put the code to call your instance here
     # this should get the ip of the instance, alongside the port and send the requiest to it
-    print(f"Received response from {container_id}.")
+    container_ip = container_info["ip"]
+    container_port = container_info["port"]
+    container_url = "http://" + container_ip + ":" + container_port + "/run_model"
+    
+    post(url=container_url, data=incoming_request_data)
+    
+    app.logger.info(f"Received response from {container_id}.")
 
 
 def update_container_status(container_id, status):
@@ -65,6 +72,12 @@ def update_container_status(container_id, status):
         data[container_id]["status"] = status
         with open("test.json", "w") as f:
             json.dump(data, f)
+            
+        # with open("test.json", "r") as f:
+        #     updated_data = json.load(f)
+        #     app.logger.info("Updated status: %s", json.dumps(updated_data, indent=4))
+
+        
 
 
 def process_request(incoming_request_data):
@@ -85,6 +98,8 @@ def process_request(incoming_request_data):
         update_container_status(free_container, "free")
     else:
         request_queue.append(incoming_request_data)
+    
+    app.logger.info(request_queue)
 
 
 @app.route("/new_request", methods=["POST"])
@@ -94,9 +109,9 @@ def new_request():
     return jsonify({"message": "Request received and processing started."})
 
 
-@app.route("/dummy", methods=["GET"])
-def dummy():
-    return "<h1>Hello Dummy, I am instance {}!</h1>".format(
+@app.route("/health_check", methods=["GET"])
+def health_check():
+    return "<h1>Hello, I am the orchestrator instance {} and I am running!</h1>".format(
         os.environ["INSTANCE_ID_EC2"]
     )
 
