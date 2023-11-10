@@ -1,6 +1,7 @@
 import concurrent.futures
 import requests
 
+
 # Function to make a request
 def make_request(url):
     payload = {"payload": "dummy payload"}
@@ -8,17 +9,20 @@ def make_request(url):
     response = requests.post(url, json=payload, headers=headers)
     return f"URL: {url}, Status Code: {response.status_code}"
 
+
 # URL to request
-url = "http://52.203.142.231/new_request"
+url = "http://ec2-54-160-3-184.compute-1.amazonaws.com/new_request"
 
 # Set the number of concurrent requests
-num_concurrent_requests = 20
+num_concurrent_requests = 10
 
 # Create a list of the same URL to be hit concurrently
 urls = [url] * num_concurrent_requests
 
 # Use ThreadPoolExecutor to parallelize the requests
-with concurrent.futures.ThreadPoolExecutor(max_workers=num_concurrent_requests) as executor:
+with concurrent.futures.ThreadPoolExecutor(
+    max_workers=num_concurrent_requests
+) as executor:
     # Map the make_request function to the list of URLs
     results = list(executor.map(make_request, urls))
 

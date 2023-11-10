@@ -12,6 +12,7 @@ request_queue = []
 
 # Handlers
 
+
 def update_test_json_with_ips(worker_ips):
     # For this example, we're assuming each IP is sequentially assigned to two containers
     with lock:
@@ -33,13 +34,15 @@ def update_test_json_with_ips(worker_ips):
 
 
 def send_requests_to_container(container_id, container_info, incoming_request_data):
-    app.logger.info(f"Sending request to {container_id} with data:{incoming_request_data}...")
+    app.logger.info(
+        f"Sending request to {container_id} with data:{incoming_request_data}..."
+    )
     container_ip = container_info["ip"]
     container_port = container_info["port"]
     container_url = "http://" + container_ip + ":" + container_port + "/run_model"
-    
+
     post(url=container_url, data=incoming_request_data)
-    
+
     app.logger.info(f"Received response from {container_id}.")
 
 
@@ -72,28 +75,32 @@ def process_request(incoming_request_data):
     with lock:
         with open("test.json", "r") as f:
             data = json.load(f)
-            
+
     # Process the incoming request data
     free_container = find_free_container(data)
-    
-    process_request_in_container(free_container=free_container, data=data, request_data=incoming_request_data)
-        
+    process_request_in_container(
+        free_container=free_container, data=data, request_data=incoming_request_data
+    )
+
     # Process items in the request queue
     while request_queue:
         if not request_queue:
-            app.logger.info(f"========== All requests have been processed ==========")    
+            app.logger.info(f"========== All requests have been processed ==========")
             break
-        
+
         # Dequeue the first request
-        current_request = request_queue.pop(0)  
+        current_request = request_queue.pop(0)
         free_container = find_free_container(data)
-        
-        process_request_in_container(free_container=free_container, data=data, request_data=current_request)
-         
+
+        process_request_in_container(
+            free_container=free_container, data=data, request_data=current_request
+        )
+
     app.logger.info(f"Current queue: {request_queue}.")
-    
-    
+
+
 # Routes
+
 
 @app.route("/health_check", methods=["GET"])
 def health_check():
@@ -127,6 +134,7 @@ def new_request():
     incoming_request_data = request.json
     threading.Thread(target=process_request, args=(incoming_request_data,)).start()
     return jsonify({"message": "Request received and processing started."})
+
 
 if __name__ == "__main__":
     app.logger.setLevel(logging.INFO)
