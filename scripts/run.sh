@@ -37,11 +37,15 @@ echo -e "Deploying the infrastructure...\n"
 echo -e "Sending requests...\n"
 ./send_requests.sh
 
+# SSH into the Orchestrator and view logs
+echo "Connecting to the Orchestrator to view logs..."
+ssh -o StrictHostKeyChecking=no -i ../infrastructure/key_pair_Test.pem ec2-user@$ORCHESTRATOR_DNS "sudo docker ps -q | xargs -I{} sudo docker logs -f {}"
+
 # Terminating the infrastructure
-# echo -e "Terminating infrastructure...\n"
-# ./kill_instances.sh
+echo -e "Terminating infrastructure...\n"
+./kill_instances.sh
 
 # Clears the content of env_vars.sh
-# > env_vars.sh
+> env_vars.sh
 
 echo -e "You successfully ended Assignment 2 :)"
