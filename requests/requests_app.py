@@ -1,4 +1,5 @@
 import concurrent.futures
+import os
 import requests
 
 
@@ -10,8 +11,15 @@ def make_request(url):
     return f"URL: {url}, Status Code: {response.status_code}"
 
 
+# Read the Orchestrator DNS from environment variable
+orchestrator_dns = os.getenv("ORCHESTRATOR_DNS")
+if not orchestrator_dns:
+    raise ValueError("Orchestrator DNS not provided in environment variables")
+
+print("Orchestrator DNS: ", orchestrator_dns)
+
 # URL to request
-url = "http://ec2-54-160-3-184.compute-1.amazonaws.com/new_request"
+url = f"http://{orchestrator_dns}/new_request"
 
 # Set the number of concurrent requests
 num_concurrent_requests = 10
