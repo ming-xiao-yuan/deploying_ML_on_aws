@@ -11,7 +11,6 @@ def make_request(url):
 
 
 # Read the Orchestrator DNS from environment variable
-<<<<<<< HEAD
 ORCEHSTRATOR_DNS = os.getenv("ORCHESTRATOR_DNS")
 
 if not ORCEHSTRATOR_DNS:
@@ -21,16 +20,6 @@ print("Orchestrator DNS: ", ORCEHSTRATOR_DNS)
 
 # URL to request
 url = f"http://{ORCEHSTRATOR_DNS}/new_request"
-=======
-orchestrator_dns = os.getenv("ORCHESTRATOR_DNS")
-if not orchestrator_dns:
-    raise ValueError("Orchestrator DNS not provided in environment variables")
-
-print("Orchestrator DNS: ", orchestrator_dns)
-
-# URL to request
-url = f"http://{orchestrator_dns}/new_request"
->>>>>>> 676da51... automate sending requests and deploy in local docker container
 
 # Set the number of concurrent requests
 num_concurrent_requests = 20
