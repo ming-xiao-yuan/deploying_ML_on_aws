@@ -20,6 +20,8 @@ WORKER_IPS=$(echo $WORKER_IPS_JSON | grep -oP '(?<=")[\d.]+(?=")')
 
 # Fetch the orchestrator public DNS
 ORCHESTRATOR_DNS=$(terraform.exe output -raw orchestrator_public_dns)
+echo "export ORCHESTRATOR_DNS='$ORCHESTRATOR_DNS'" >> ../scripts/env_vars.sh
+
 
 # Function to check if a service is up and running
 check_service() {

@@ -34,6 +34,9 @@ echo -e "-----------\n"
 echo -e "Deploying the infrastructure...\n"
 ./create_instances.sh
 
+echo -e "Sending requests...\n"
+./send_requests.sh
+
 # Terminating the infrastructure
 # echo -e "Terminating infrastructure...\n"
 # ./kill_instances.sh

@@ -4,14 +4,14 @@
 source env_vars.sh
 
 # Pulling requests_app's image
-docker pull ikrash3d/requests_app:latest
+docker pull mingxiaoyuan/requests:latest
 
 echo -e "\nSending requests...\n"
 
-# Running the requests_app's container
-docker run -e load_balancer_url="$load_balancer_url" -d --name requests_app_latest ikrash3d/requests_app:latest
+# Running the requests_app's container with Orchestrator DNS
+docker run -e ORCHESTRATOR_DNS="$ORCHESTRATOR_DNS" mingxiaoyuan/requests:latest
 
-## Showing the requests_app's prints
+# Showing the requests_app's prints
 docker logs -f requests_app_latest
 
 # Removing the requests_app's container
