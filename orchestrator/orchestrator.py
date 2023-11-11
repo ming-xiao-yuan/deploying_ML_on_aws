@@ -5,13 +5,11 @@ import threading
 import json
 from requests import post
 
-
 app = Flask(__name__)
 lock = threading.Lock()
 request_queue = []
 
 # Handlers
-
 
 def update_test_json_with_ips(worker_ips):
     # For this example, we're assuming each IP is sequentially assigned to two containers
@@ -81,13 +79,15 @@ def process_request(incoming_request_data):
     process_request_in_container(
         free_container=free_container, data=data, request_data=incoming_request_data
     )
-
+    
+    # Showcase the amount of requests in the queue
+    app.logger.info(f"{len(request_queue)} requests remaining in queue")
+ 
     # Process items in the request queue
     while request_queue:
         if not request_queue:
-            app.logger.info(f"========== All requests have been processed ==========")
             break
-
+        
         # Dequeue the first request
         current_request = request_queue.pop(0)
         free_container = find_free_container(data)
@@ -95,12 +95,9 @@ def process_request(incoming_request_data):
         process_request_in_container(
             free_container=free_container, data=data, request_data=current_request
         )
-
-    app.logger.info(f"Current queue: {request_queue}.")
-
-
+        
+        
 # Routes
-
 
 @app.route("/health_check", methods=["GET"])
 def health_check():

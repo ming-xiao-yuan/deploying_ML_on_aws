@@ -15,6 +15,7 @@ terraform.exe apply -auto-approve -var="AWS_ACCESS_KEY=$AWS_ACCESS_KEY" -var="AW
 
 # Capture the IP addresses in JSON format
 WORKER_IPS_JSON=$(terraform.exe output -json worker_ips)
+
 # Extract IPs from JSON without using jq
 WORKER_IPS=$(echo $WORKER_IPS_JSON | grep -oP '(?<=")[\d.]+(?=")')
 

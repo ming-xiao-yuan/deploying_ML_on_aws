@@ -2,7 +2,6 @@ import concurrent.futures
 import os
 import requests
 
-
 # Function to make a request
 def make_request(url):
     payload = {"payload": "dummy payload"}
@@ -12,14 +11,15 @@ def make_request(url):
 
 
 # Read the Orchestrator DNS from environment variable
-orchestrator_dns = os.getenv("ORCHESTRATOR_DNS")
-if not orchestrator_dns:
+ORCEHSTRATOR_DNS = os.getenv("ORCHESTRATOR_DNS")
+
+if not ORCEHSTRATOR_DNS:
     raise ValueError("Orchestrator DNS not provided in environment variables")
 
-print("Orchestrator DNS: ", orchestrator_dns)
+print("Orchestrator DNS: ", ORCEHSTRATOR_DNS)
 
 # URL to request
-url = f"http://{orchestrator_dns}/new_request"
+url = f"http://{ORCEHSTRATOR_DNS}/new_request"
 
 # Set the number of concurrent requests
 num_concurrent_requests = 20
