@@ -4,9 +4,7 @@
 source env_vars.sh
 
 # Pulling requests_app's image
-docker pull mingxiaoyuan/requests:latest
-
-echo -e "\nSending requests...\n"
+docker pull ikrash3d/requests:latest
 
 # Running the requests_app's container with Orchestrator DNS
-docker run --rm -e ORCHESTRATOR_DNS="$ORCHESTRATOR_DNS" mingxiaoyuan/requests:latest
+docker run -e ORCHESTRATOR_DNS="$ORCHESTRATOR_DNS" ikrash3d/requests:latest

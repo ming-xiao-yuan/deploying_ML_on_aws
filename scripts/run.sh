@@ -3,14 +3,14 @@
 # Access the env variables
 source env_vars.sh
 
-# cd ../infrastructure
+cd ../infrastructure
 
-# echo "Please provide your email for the SSH Key"
-# read EMAIL
+echo "Please provide your email for the SSH Key"
+read EMAIL
 
-# ssh-keygen -t rsa -b 4096 -C $EMAIL -f my_terraform_key
+ssh-keygen -t rsa -b 4096 -C $EMAIL -f my_terraform_key
 
-# cd ../scripts
+cd ../scripts
 
 # Getting AWS credentials from the terminal
 echo "Please provide your AWS Access Key: "
@@ -30,22 +30,12 @@ echo "export AWS_SESSION_TOKEN='$AWS_SESSION_TOKEN'" >> env_vars.sh
 echo -e "Starting Assignment 2...\n"
 echo -e "-----------\n"
 
-## Deploying the infrastructure
+# Deploying the infrastructure
 echo -e "Deploying the infrastructure...\n"
 ./create_instances.sh
 
+# Sending requests to the orchestrator 
 echo -e "Sending requests...\n"
 ./send_requests.sh
-
-# SSH into the Orchestrator and view logs
-echo "Connecting to the Orchestrator to view logs..."
-ssh -o StrictHostKeyChecking=no -i ../infrastructure/key_pair_Test.pem ec2-user@$ORCHESTRATOR_DNS "sudo docker ps -q | xargs -I{} sudo docker logs -f {}"
-
-# Terminating the infrastructure
-echo -e "Terminating infrastructure...\n"
-./kill_instances.sh
-
-# Clears the content of env_vars.sh
-> env_vars.sh
 
 echo -e "You successfully ended Assignment 2 :)"

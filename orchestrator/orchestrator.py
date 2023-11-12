@@ -132,6 +132,14 @@ def new_request():
     threading.Thread(target=process_request, args=(incoming_request_data,)).start()
     return jsonify({"message": "Request received and processing started."})
 
+@app.route("/workers_info", methods=["GET"])
+def get_workers_status():
+        with open("test.json", "r") as file:
+            data = json.load(file)
+    
+        workers_info = json.dumps(data, indent=4)
+        return jsonify({"workers info": json.loads(workers_info)})
+
 
 if __name__ == "__main__":
     app.logger.setLevel(logging.INFO)
